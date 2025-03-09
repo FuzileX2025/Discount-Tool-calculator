@@ -1,0 +1,158 @@
+"use client"
+
+import { useState } from "react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Calculator from "./calculator"
+import About from "./about"
+import Examples from "./examples"
+import Results from "./results"
+
+export default function DiscountCalculator() {
+  const [results, setResults] = useState<{
+    invoiceAmount: number
+    discountPercentage: number
+    paymentTermStandard: number
+    paymentTermDiscount: number
+    bankInterestRate: number
+    opportunityCostRate: number
+    costOfTakingDiscount: number
+    costOfNotTakingDiscount: number
+    annualizedDiscountRate: number
+    recommendation: string
+  } | null>(null)
+
+  return (
+    <div className="container mx-auto py-10">
+      <h1 className="text-3xl font-bold text-center mb-6">Early Payment Discount Analysis Tool</h1>
+      <Tabs defaultValue="calculator" className="w-full">
+        <TabsList className="grid grid-cols-4 mb-8">
+          <TabsTrigger value="calculator">Calculator</TabsTrigger>
+          <TabsTrigger value="results" disabled={!results}>
+            Results
+          </TabsTrigger>
+          <TabsTrigger value="examples">Examples</TabsTrigger>
+          <TabsTrigger value="about">About</TabsTrigger>
+        </TabsList>
+        <TabsContent value="calculator">
+          <Calculator setResults={setResults} />
+        </TabsContent>
+        <TabsContent value="results">{results && <Results results={results} />}</TabsContent>
+        <TabsContent value="examples">
+          <Examples />
+        </TabsContent>
+        <TabsContent value="about">
+          <About />
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+export default function About() {
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>About Early Payment Discounts</CardTitle>
+          <CardDescription>
+            Understanding the financial implications of taking or not taking early payment discounts
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p>
+            Early payment discounts (also known as cash discounts or prompt payment discounts) are incentives offered by suppliers to encourage buyers to pay their invoices before the standard due date. A typical discount might be expressed as "3/20, net 30," meaning the buyer can deduct 3% from the invoice if paid within 20 days, otherwise the full amount is due in 30 days.
+          </p>
+          <p>
+            While these discounts may seem small, they can represent significant savings when annualized and compared to other financing options. This tool helps you determine whether taking the discount makes financial sense based on your cost of capital.
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Key Formulas</CardTitle>
+          <CardDescription>
+            The mathematical calculations behind the discount analysis
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Annualized Discount Rate</h3>
+            <p className="mb-2">This formula converts the discount percentage into an annualized interest rate, allowing comparison with borrowing costs:</p>
+            <div className="p-4 bg-muted rounded-md">
+              <p className="font-mono">
+                Annualized Discount Rate = (Discount % / (100% - Discount %)) × (365 / Days Difference) × 100%
+              </p>
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Example: For a 3% discount with 10 days difference (3/20, net 30), the annualized rate is (3/97) × (365/10) × 100% = 112.9%
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Cost of Taking Discount</h3>
+            <p className="mb-2">The total cost when paying early to receive the discount:</p>
+            <div className="p-4 bg-muted rounded-md">
+              <p className="font-mono">
+                Cost of Taking Discount = Discounted Amount + Interest Cost on Borrowed Funds
+              </p>
+              <p className="font-mono mt-2">
+                Interest Cost = Discounted Amount × Daily Interest Rate × Days Difference
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Cost of Not Taking Discount</h3>
+            <p className="mb-2">The cost when paying at the standard payment term:</p>
+            <div className="p-4 bg-muted rounded-md">
+              <p className="font-mono">
+                Cost of Not Taking Discount = Full Invoice Amount
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Opportunity Cost</h3>
+            <p className="mb-2">The potential return lost by using capital for early payment instead of alternative investments:</p>
+            <div className="p-4 bg-muted rounded-md">
+              <p className="font-mono">
+                Opportunity Cost = Payment Amount × Opportunity Cost Rate × (Days Difference / 365)
+              </p>
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              This represents the return that could have been earned if the money used for early payment was invested elsewhere.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Decision Rule</CardTitle>
+          <CardDescription>
+            How to determine whether to take the discount
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4">
+            The basic decision rule is to compare the annualized discount rate with your cost of capital (typically your borrowing rate):
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>
+              <span className="font-medium">If Annualized Discount Rate > Borrowing Rate:</span> Take the discount, as the savings exceed the cost of obtaining funds for early payment.
+            </li>
+            <li>
+              <span className="font-medium">If Annualized Discount Rate < Borrowing Rate:</span> Do not take the discount, as the cost of obtaining funds exceeds the savings from the discount.
+            </li>
+          </ul>
+          <p className="mt-4">
+            Additional factors to consider include cash flow constraints, opportunity costs, and the administrative burden of processing payments.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
